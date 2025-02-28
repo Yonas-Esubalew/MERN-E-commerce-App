@@ -10,6 +10,8 @@ import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv"
 dotenv.config()
+
+
 export async function registerUserController(req, res) {
   try {
     const { name, email, password } = req.body;
