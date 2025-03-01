@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer, useState } from "react";
 import logo from "../assets/logo.png";
 import Search from "./Search";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ const Header = () => {
   const redirectToLogin = () => {
     navigate("/login");
   };
+  const user = useReducer
   console.log("location", location);
   console.log("isMobile", isMobile);
   const isSearchPage = location?.pathname === "/search";

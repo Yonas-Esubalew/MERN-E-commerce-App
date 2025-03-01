@@ -11,11 +11,10 @@ const OtpVerification = () => {
   const location = useLocation();
   console.log("location", location);
   useEffect(() => {
-    if (!location?.data?.message) {
+    if (!location?.state?.email) {
       navigate("/forgot-password");
     }
   }, []);
-
   const validValue = data.every((el) => el);
 
   const handleSubmit = async (e) => {
@@ -26,25 +25,27 @@ const OtpVerification = () => {
         ...SummaryApi.verifyForgotPasswordOtp,
         data: {
           otp: data.join(""),
-          email: location?.data?.message,
+          email: location?.state?.email,
         },
       });
-
       if (response.data.error) {
         toast.error(response.data.message);
       }
-
       if (response.data.success) {
         toast.success(response.data.message);
         setData(["", "", "", "", "", ""]);
-        navigate("/");
+        navigate("/reset-password", {
+          state: {
+            data: response.data,
+            email: location?.state?.email
+          },
+        });
       }
       console.log("response", response);
     } catch (error) {
       AxiosToastError(error);
     }
   };
-
   return (
     <section className="w-full container mx-auto px-1">
       <div className="bg-white my-4 w-full max-w-lg mx-auto rounded p-4">
@@ -79,11 +80,6 @@ const OtpVerification = () => {
                 />
               ))}
             </div>
-            {/* <input
-              type="text"
-              id="otp"
-              className="bg-blue-50 focus-within:border-primary-200 mm-auto outline-none border rounded p-2"
-            /> */}
           </div>
           {validValue ? (
             <button className="bg-green-800 text-white p-2 rounded font-semibold hover:bg-green-700 my-3 tracking-wide">

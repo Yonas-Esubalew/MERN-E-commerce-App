@@ -10,7 +10,6 @@ const Login = () => {
   const [data, setData] = useState({
     email: "",
     password: "",
-   
   });
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -42,6 +41,8 @@ const Login = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
+        localStorage.setItem("accessToken", response.data.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.data.refreshToken);
         setData({
           email: "",
           password: "",
@@ -58,7 +59,6 @@ const Login = () => {
       <div className="bg-white my-4 w-full max-w-lg mx-auto rounded p-4">
         <p>Welcome to Binkeyit</p>
         <form onSubmit={handleSubmit} className="grid gap-4 mt-6">
-          
           <div className="grid gap-1">
             <label htmlFor="email">Email : </label>
             <input
@@ -97,7 +97,12 @@ const Login = () => {
                 )}
               </div>
             </div>
-           <Link to={"/forgot-password"} className="hover:text-primary-100 block ml-auto">Forgot Password?</Link>
+            <Link
+              to={"/forgot-password"}
+              className="hover:text-primary-100 block ml-auto"
+            >
+              Forgot Password?
+            </Link>
           </div>
           {validValue ? (
             <button className="bg-green-800 text-white p-2 rounded font-semibold hover:bg-green-700 my-3 tracking-wide">
@@ -111,7 +116,13 @@ const Login = () => {
         </form>
 
         <p>
-            Don't have an account? <Link className="hover:text-green-700 font-bold text-green-800 " to="/register">Register</Link>
+          Don't have an account?{" "}
+          <Link
+            className="hover:text-green-700 font-bold text-green-800 "
+            to="/register"
+          >
+            Register
+          </Link>
         </p>
       </div>
     </section>

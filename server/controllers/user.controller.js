@@ -8,9 +8,8 @@ import uploadImageCloudinary from "../utils/uploadImageCloudinary.js";
 import generatedOtp from "../utils/generatedOtp.js";
 import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv"
-dotenv.config()
-
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function registerUserController(req, res) {
   try {
@@ -134,6 +133,10 @@ export async function loginController(req, res) {
     }
     const accessToken = await generatedAccessToken(user._id);
     const refreshToken = await generatedRefreshToken(user._id);
+
+    // const updateUser = await UserModel.findByIdAndUpdate(user?._id, {
+    //   last_login_date: new Date()
+    // })
     const cookiesOption = {
       httpOnly: true,
       secure: true,
@@ -341,6 +344,11 @@ export async function verifyForgotPasswordOtp(req, res) {
       });
     }
 
+    const updateUser = await UserModel.findByIdAndUpdate(user._id, {
+      forgot_password_otp: "",
+      forgot_password_expiry: "",
+    })
+
     return res.json({
       message: "Verify OTP Successfully",
       error: false,
@@ -426,37 +434,60 @@ export async function refreshTokenController(req, res) {
       process.env.SECRET_KEY_REFRESH_TOKEN
     );
 
-    if(!verifyToken){
+    if (!verifyToken) {
       return res.status(401).json({
         message: "Token Expired",
         error: true,
         success: false,
       });
     }
-    console.log("verifyToken", verifyToken)
-    const userId = verifyToken?._id
+    console.log("verifyToken", verifyToken);
+    const userId = verifyToken?._id;
 
-    const newAccessToken = await generatedAccessToken(userId)
+    const newAccessToken = await generatedAccessToken(userId);
 
-    const cookiesOption= {
+    const cookiesOption = {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-    }
-    res.cookie("accessToken", newAccessToken, cookiesOption)
-
+    };
+    res.cookie("accessToken", newAccessToken, cookiesOption);
 
     return res.json({
       message: "New Access Token Generated.",
       error: false,
       success: true,
       data: {
-        accessToken: newAccessToken
+        accessToken: newAccessToken,
       },
     });
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+export async function userDetails(req, res) {
+  try {
+    const userId = req.userId;
+
+    const user = await UserModel.findById(userId).select("-password -refresh_token");
+
+  
+    return res.json({
+      message: "User Details",
+      error: false,
+      success: true,
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
       error: true,
       success: false,
     });
