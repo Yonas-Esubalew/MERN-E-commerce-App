@@ -11,7 +11,7 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: process.env.FRONTEND_URI,
+    origin: process.env.FRONTEND_URL,
   })
 );
 
@@ -24,7 +24,7 @@ app.use(
   })
 );
 
-const PORT = 8080 || process.env.PORT;
+const PORT = 5000 || process.env.PORT;
 
 app.get("/", (req, res) => {
   res.json({

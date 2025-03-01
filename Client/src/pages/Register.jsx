@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
+import Axios from "../utils/Axios";
+import SummaryApi from "../common/SummaryApi";
+import AxiosToastError from "../utils/AxiosToastError";
+import { Link, useNavigate } from "react-router-dom";
 const Register = () => {
   const [data, setData] = useState({
     name: "",
@@ -8,18 +13,49 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const validValue = Object.values(data).every((el) => el);
   const handleChange = (e) => {
-    const { name, value } = e.target.value;
+    const { name, value } = e.target;
     setData((prev) => {
       return { ...prev, [name]: value };
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(data);
+    console.log("data", data);
+
+    if (data.password !== data.confirmPassword) {
+      toast.error("password and confirm password must be same");
+      return;
+    }
+
+    try {
+      const response = await Axios({
+        ...SummaryApi.register,
+        data: data,
+      });
+
+      if (response.data.error) {
+        toast.error(response.data.message);
+      }
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        navigate("/login");
+      }
+      console.log("response", response);
+    } catch (error) {
+      AxiosToastError(error);
+    }
   };
   return (
     <section className="w-full container mx-auto px-1">
@@ -35,7 +71,7 @@ const Register = () => {
               autoFocus
               className="bg-blue-50 border rounded p-2 focus-within:border-primary-200 mm-auto outline-none"
               value={data.name}
-              onchange={handleChange}
+              onChange={handleChange}
               placeholder="Enter your name"
             />
           </div>
@@ -47,7 +83,7 @@ const Register = () => {
               id="email"
               className="bg-blue-50 focus-within:border-primary-200 mm-auto outline-none border rounded p-2"
               value={data.email}
-              onchange={handleChange}
+              onChange={handleChange}
               placeholder="Enter your email"
             />
           </div>
@@ -60,7 +96,7 @@ const Register = () => {
                 id="password"
                 className="w-full outline-none bg-blue-50"
                 value={data.password}
-                onchange={handleChange}
+                onChange={handleChange}
                 placeholder="Enter your password"
               />
               <div>
@@ -87,7 +123,7 @@ const Register = () => {
                 id="confirmPassword"
                 className="w-full outline-none bg-blue-50"
                 value={data.confirmPassword}
-                onchange={handleChange}
+                onChange={handleChange}
                 placeholder="Enter your confirm password"
               />
               <div>
@@ -115,6 +151,10 @@ const Register = () => {
             </button>
           )}
         </form>
+
+        <p>
+            Already have an account? <Link className="hover:text-green-600 font-bold text-green-800 " to="/login">Login</Link>
+        </p>
       </div>
     </section>
   );
